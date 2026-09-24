@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ผลการประเมินการจัดการเรียนการสอน - โรงเรียนมหาไถ่ศึกษาภาคตะวันออกเฉียงเหนือ</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>body { font-family: 'Sarabun', sans-serif; }</style>
+</head>
+<body class="bg-gray-100 text-gray-900 min-h-screen pb-12">
+
+    <!-- Header โทนสีแดง-ขาว เป็นทางการ พร้อมตราโรงเรียน และปีการศึกษา 2569 -->
+    <header class="bg-red-900 text-white shadow-lg border-b-4 border-yellow-500">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="flex items-center space-x-4">
+                <div class="bg-white p-1 rounded-full shadow-md border-2 border-yellow-400 w-16 h-16 flex items-center justify-center">
+                    <img src="https://yt3.googleusercontent.com/BFbVKyC_p3RToa_4YLWgjydWozCp9k-DA6z7hz_rrx5PkAWypLK6P7Lx5DxFdruIQM5ms9hkRw=s900-c-k-c0x00ffffff-no-rj" alt="Logo" class="w-14 h-14 object-contain rounded-full">
+                </div>
+                <div>
+                    <h1 class="text-xl md:text-2xl font-bold tracking-wide">โรงเรียนมหาไถ่ศึกษาภาคตะวันออกเฉียงเหนือ</h1>
+                    <p class="text-xs md:text-sm text-red-200">ระบบสารสนเทศเพื่อการนิเทศและประเมินประสิทธิภาพการจัดการเรียนการสอน</p>
+                </div>
+            </div>
+            <div class="bg-red-800 text-white px-4 py-2 rounded-lg text-sm font-semibold border border-red-700 shadow">
+                ปีการศึกษา 2569
+            </div>
+        </div>
+        <!-- แถบปุ่มเลือกหน้าหลักและกลุ่มสาระการเรียนรู้ -->
+        <div id="tabs-container" class="bg-red-950 px-4 py-3 flex flex-wrap gap-2 justify-center shadow-inner border-t border-red-800">
+            <span class="text-red-200 text-sm self-center">กำลังโหลดเมนู...</span>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-4 py-8 space-y-8">
+        
+        <!-- หัวข้อหน้า/กลุ่มสาระ -->
+        <div class="text-center space-y-1">
+            <h2 id="group-title" class="text-3xl font-bold text-red-900">โรงเรียนมหาไถ่ศึกษาภาคตะวันออกเฉียงเหนือ</h2>
+            <p id="group-subtitle" class="text-sm text-gray-600">สรุปผลการประเมินประสิทธิภาพการจัดการเรียนการสอน 3 ด้าน</p>
+        </div>
+
+        <!-- การ์ดแสดงค่าเฉลี่ยทั้ง 3 ด้าน -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="bg-white text-gray-800 p-6 rounded-xl shadow-md text-center border-t-4 border-red-800">
+                <div id="label-d1" class="text-sm font-bold text-gray-600 mb-1">ด้านที่ 1: แผนจัดการเรียนรู้</div>
+                <div id="d1-avg" class="text-3xl font-extrabold text-red-900">-</div>
+            </div>
+            <div class="bg-white text-gray-800 p-6 rounded-xl shadow-md text-center border-t-4 border-red-800">
+                <div id="label-d2" class="text-sm font-bold text-gray-600 mb-1">ด้านที่ 2: การจัดการเรียนรู้</div>
+                <div id="d2-avg" class="text-3xl font-extrabold text-red-900">-</div>
+            </div>
+            <div class="bg-white text-gray-800 p-6 rounded-xl shadow-md text-center border-t-4 border-yellow-600">
+                <div id="label-d3" class="text-sm font-bold text-gray-600 mb-1">ด้านที่ 3: ผลที่เกิดกับผู้เรียน</div>
+                <div id="d3-avg" class="text-3xl font-extrabold text-yellow-700">-</div>
+            </div>
+        </div>
+
+        <!-- ข้อความสรุปภาพรวมระดับคุณภาพ -->
+        <div class="text-center py-2">
+            <p class="text-lg font-bold text-gray-800">
+                ผลการประเมินภาพรวมอยู่ในระดับ <span class="text-red-800 bg-red-50 px-4 py-1 rounded-lg border border-red-200 shadow-sm">ยอดเยี่ยม</span>
+            </p>
+        </div>
+
+        <!-- ส่วนแสดงผลเพิ่มเติม (แสดงสรุปกลุ่มสาระ หรือ 10 อันดับครูในหน้าหลัก / ตารางครูในหน้ากลุ่มสาระ) -->
+        <div id="dynamic-content-area" class="space-y-8">
+            <!-- แทรกผ่าน JavaScript -->
+        </div>
+
+    </main>
+
+    <script>
+        let globalData = null;
+        let currentTab = 'HOME';
+
+        window.onload = function() {
+            google.script.run
+                .withSuccessHandler(onDataLoaded)
+                .withFailureHandler(onDataError)
+                .getEvaluationData();
+        };
+
+        function onDataLoaded(data) {
+            globalData = data;
+            renderTabs();
+            renderView('HOME');
+        }
+
+        function onDataError(err) {
+            console.error(err);
+            alert('เกิดข้อผิดพลาดในการโหลดข้อมูล: ' + err.message);
+        }
+
+        function renderTabs() {
+            const tabsContainer = document.getElementById('tabs-container');
+            const groups = Object.keys(globalData.groups);
+            
+            let html = `
+                <button onclick="switchTab('HOME')" class="px-4 py-2 rounded-lg font-semibold text-sm transition shadow ${currentTab === 'HOME' ? 'bg-white text-red-900 ring-2 ring-yellow-400 font-bold' : 'bg-red-900 text-red-100 hover:bg-red-800 border border-red-800'}">
+                    🏠 หน้าหลัก
+                </button>
+            `;
+            
+            groups.forEach(g => {
+                const isActive = currentTab === g;
+                html += `
+                    <button onclick="switchTab('${g}')" class="px-4 py-2 rounded-lg font-semibold text-sm transition shadow ${isActive ? 'bg-white text-red-900 ring-2 ring-yellow-400 font-bold' : 'bg-red-900 text-red-100 hover:bg-red-800 border border-red-800'}">
+                        ${g}
+                    </button>
+                `;
+            });
+            tabsContainer.innerHTML = html;
+        }
+
+        function switchTab(tabName) {
+            currentTab = tabName;
+            renderTabs();
+            renderView(tabName);
+        }
+
+        function renderView(tab) {
+            const contentArea = document.getElementById('dynamic-content-area');
+
+            if (tab === 'HOME') {
+                document.getElementById('group-title').innerText = 'หน้าหลัก (ภาพรวมโรงเรียน)';
+                document.getElementById('group-subtitle').innerText = 'สรุปผลการประเมินประสิทธิภาพการจัดการเรียนการสอน 3 ด้าน (ภาพรวมโรงเรียน)';
+                
+                document.getElementById('label-d1').innerText = 'ด้านที่ 1: แผนจัดการเรียนรู้';
+                document.getElementById('label-d2').innerText = 'ด้านที่ 2: การจัดการเรียนรู้';
+                document.getElementById('label-d3').innerText = 'ด้านที่ 3: ผลที่เกิดกับผู้เรียน';
+
+                document.getElementById('d1-avg').innerText = globalData.schoolSummary.d1;
+                document.getElementById('d2-avg').innerText = globalData.schoolSummary.d2;
+                document.getElementById('d3-avg').innerText = globalData.schoolSummary.d3;
+
+                // สร้าง HTML สำหรับสรุปกลุ่มสาระ และ 10 ลำดับสูงสุดโรงเรียน
+                let groupsHtml = `
+                    <div class="bg-white p-6 rounded-xl shadow-md border border-gray-200 space-y-4">
+                        <h3 class="text-xl font-bold text-red-900 border-b-2 border-red-900 pb-2">📚 สรุปคะแนนเฉลี่ยรายกลุ่มสาระการเรียนรู้</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                `;
+
+                for (let gName in globalData.groups) {
+                    let teachers = globalData.groups[gName];
+                    let gAvg = teachers.length > 0 ? (teachers.reduce((sum, t) => sum + t.summaryTotal, 0) / teachers.length).toFixed(2) : '0.00';
+                    groupsHtml += `
+                        <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 flex justify-between items-center shadow-sm">
+                            <div>
+                                <div class="font-bold text-gray-900 text-sm">${gName}</div>
+                                <div class="text-xs text-gray-500">จำนวนครู: ${teachers.length} ท่าน</div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-lg font-extrabold text-red-900">${gAvg}</div>
+                                <div class="text-[10px] text-gray-500">คะแนนเฉลี่ย</div>
+                            </div>
+                        </div>
+                    `;
+                }
+                groupsHtml += `</div></div>`;
+
+                // 10 ลำดับสูงสุดโรงเรียน
+                let top10Html = `
+                    <div class="bg-white p-6 rounded-xl shadow-md border border-gray-200 space-y-4">
+                        <h3 class="text-xl font-bold text-red-900 border-b-2 border-red-900 pb-2">🏆 10 อันดับแรก (Top 10) คะแนนสูงสุดระดับโรงเรียน</h3>
+                        <div class="space-y-2.5">
+                `;
+
+                globalData.top10.forEach((t, index) => {
+                    top10Html += `
+                        <div class="bg-gray-50 p-3.5 rounded-lg grid grid-cols-12 items-center text-gray-800 font-medium shadow-sm border border-gray-200">
+                            <div class="col-span-1 text-center font-bold text-red-900">#${index + 1}</div>
+                            <div class="col-span-6 pl-2 font-semibold text-gray-900">${t.name} <span class="text-xs text-gray-500 font-normal">(${t.group})</span></div>
+                            <div class="col-span-2 text-center text-sm text-gray-600">ร.1: ${t.round1.total} | ร.2: ${t.round2.total}</div>
+                            <div class="col-span-3 text-right font-extrabold text-red-800 text-base">คะแนนรวม: ${t.summaryTotal}</div>
+                        </div>
+                    `;
+                });
+                top10Html += `</div></div>`;
+
+                contentArea.innerHTML = groupsHtml + top10Html;
+
+            } else {
+                // มุมมองรายกลุ่มสาระ
+                document.getElementById('group-title').innerText = `กลุ่มสาระการเรียนรู้${tab}`;
+                document.getElementById('group-subtitle').innerText = `สรุปผลการประเมินประสิทธิภาพการจัดการเรียนการสอนรายกลุ่มสาระ`;
+
+                const teachers = globalData.groups[tab] || [];
+
+                let avgD1 = teachers.length > 0 ? (teachers.reduce((sum, t) => sum + t.d1, 0) / teachers.length).toFixed(2) : '0.00';
+                let avgD2 = teachers.length > 0 ? (teachers.reduce((sum, t) => sum + t.d2, 0) / teachers.length).toFixed(2) : '0.00';
+                let avgD3 = teachers.length > 0 ? (teachers.reduce((sum, t) => sum + t.d3, 0) / teachers.length).toFixed(2) : '0.00';
+
+                document.getElementById('label-d1').innerText = 'ด้านที่ 1: แผนจัดการเรียนรู้';
+                document.getElementById('label-d2').innerText = 'ด้านที่ 2: การจัดการเรียนรู้';
+                document.getElementById('label-d3').innerText = 'ด้านที่ 3: ผลที่เกิดกับผู้เรียน';
+
+                document.getElementById('d1-avg').innerText = avgD1;
+                document.getElementById('d2-avg').innerText = avgD2;
+                document.getElementById('d3-avg').innerText = avgD3;
+
+                let tableHtml = `
+                    <div class="bg-white p-6 rounded-xl shadow-md border border-gray-200 space-y-4">
+                        <div class="grid grid-cols-12 font-bold text-red-900 px-4 text-center md:text-left text-sm md:text-base border-b-2 border-red-900 pb-3">
+                            <div class="col-span-1 text-center">ลำดับ</div>
+                            <div class="col-span-5">รายชื่อคุณครูผู้สอน</div>
+                            <div class="col-span-2 text-center">นิเทศ ครั้งที่ 1</div>
+                            <div class="col-span-2 text-center">นิเทศ ครั้งที่ 2</div>
+                            <div class="col-span-2 text-center">สรุปรวม</div>
+                        </div>
+                        <div class="space-y-2.5">
+                `;
+
+                if (teachers.length > 0) {
+                    teachers.forEach((t, index) => {
+                        tableHtml += `
+                            <div class="bg-gray-50 p-3.5 rounded-lg grid grid-cols-12 items-center text-gray-800 font-medium shadow-sm border border-gray-200 hover:bg-red-50/40 transition">
+                                <div class="col-span-1 text-center font-bold text-red-900">#${index + 1}</div>
+                                <div class="col-span-5 pl-2 font-semibold text-gray-900">${t.name}</div>
+                                <div class="col-span-2 text-center font-bold text-gray-700">${t.round1.total}</div>
+                                <div class="col-span-2 text-center font-bold text-gray-700">${t.round2.total}</div>
+                                <div class="col-span-2 text-center font-extrabold text-red-800">${t.summaryTotal}</div>
+                            </div>
+                        `;
+                    });
+                } else {
+                    tableHtml += `<div class="text-center py-6 text-gray-500">ไม่พบข้อมูลคุณครูในกลุ่มสาระนี้</div>`;
+                }
+
+                tableHtml += `</div></div>`;
+                contentArea.innerHTML = tableHtml;
+            }
+        }
+    </script>
+</body>
+</html>
